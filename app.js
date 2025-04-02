@@ -59,26 +59,40 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/cadastro", (req, res) => {
-  console.log("POST /cadastro");
+  console.log("GET /cadastro");
   res.render("cadastro");
 });
 
-app.get("/cadastro", (req, res) => {
-  console.log("GET /cadastro");
-  !req.body
-    ? console.log(`Body vazio: ${req.body}`)
-    : console.log(`${JSON.stringify(req.body)}`);
-  res.send(cadastro);
-});
-
 app.post("/cadastro", (req, res) => {
-  req.body
+  console.log("POST /cadastro");
+  !req.body
     ? console.log(JSON.stringify(req.body))
     : console.log(`Body vazio: ${req.body}`);
 
-  res.send(
-    `Bem vindo usuario: ${req.body.nome}, seu email é ${req.body.email}`
-  );
+  const { nome, senha, email, celular, cpf, rg } = req.body;
+
+  //
+
+  query = `SELECT * FROM users WHERE email=? OR cpf=? OR rg=? OR nome=?`;
+  db.get(query, [email, cpf, rg, nome], (err, row) => {
+    if (err) throw err;
+
+    if (row) {
+      // a variavel row ira retornar os dados do banco de dados executado atraves do SQL
+      res.send("usurario ja cadastrado, refaça o cadastro");
+    } else {
+      const insertQuery = `INSERT INTO users (nome, senha, email, celular, cpf, rg) VALUES (?,?,?,?,?,?)`;
+      db.run(insertQuery, [nome, senha, email, celular, cpf, rg], (err) => {
+        //inserir a logica do INSERT
+        if (err) throw err;
+        res.send("usuario cadastrado, com sucesso");
+      });
+    }
+  });
+
+  //   res.send(
+  //     `Bem vindo usuario: ${req.body.nome}, seu email é ${req.body.email}`
+  //   );
 });
 
 app.get("/sobre", (req, res) => {
