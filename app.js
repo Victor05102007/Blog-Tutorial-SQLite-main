@@ -58,6 +58,14 @@ app.post("/login", (req, res) => {
   res.send("login não implementado");
 });
 
+app.get("/usuarios", (req, res) => {
+  const quary = "SELECT * FROM users";
+  db.get(quary, [], (err, row) => {
+    console.log(`GET /usuarios ${JSON.stringify(row)}`);
+    res.render("usertable");
+  });
+});
+
 app.get("/cadastro", (req, res) => {
   console.log("GET /cadastro");
   res.render("cadastro");
